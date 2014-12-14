@@ -25,6 +25,9 @@
     rgb2Hex = (r, g, b)->
         '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).substr(1)
 
+    typeOf = (val)->
+        typeStr = Object::toString.call val
+        typeStr.match(/\[object (.*?)\]/)[1]
 
     ###
     UTF-16 has two kinds of lengths
@@ -34,7 +37,8 @@
     When it comes to the second situation, the browser will recognize the four bytes as a character and display correctly, 
     but its length will be regarded as 2 units.
     ###
-    strToArray = (str)->
+    strToArray = (str, utf8Only = true)->
+        if utf8Only then return str.split('')
         length = str.length
         index = -1
         array = []
@@ -49,12 +53,30 @@
                 array.push char
         array
 
+    splitChar = (str, spliter = ' ')->
+        Array.prototype.join.call(str, spliter)
+
     # Native btoa and atob cannot deal with unicode characters
     btoaUnicode = (str)->
         btoa unescape encodeURIComponent str
 
     atobUnicode = (str)->
         decodeURIComponent escape atob str
+
+
+    max = (arr)->
+        arr.reduce (max, item)->
+            if item > max then item else max
+
+    inArray = (arr, item)->
+        arr.indexOf(item) >= 0
+
+    isLittleEndian = do ->
+        buffer = new ArrayBuffer 2
+        new DataView(buffer).setInt16 0, 256, true
+        
+        new Int16Array(buffer)[0] is 256;
+
 
     # Array-Like objects, such as arguments Object, HTMLCollection
     class ArrayLike
