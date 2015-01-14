@@ -1,7 +1,7 @@
 ###
     A javascript utilities which you may never use.
-    @author: Draucpid
-    @date: Dec. 11st, 2014
+    @author Draucpid
+    @date Dec. 11st, 2014
 ###
 ((root, factory)->
     if typeof module is "object" && typeof module.exports is "object"
@@ -74,9 +74,34 @@
     isLittleEndian = do ->
         buffer = new ArrayBuffer 2
         new DataView(buffer).setInt16 0, 256, true
-        
+
         new Int16Array(buffer)[0] is 256;
 
+
+    # repeat a string n times
+    String::repeat = (times)->
+        Array(times).join @
+
+    # title string
+    String::title = ()->
+        @.trim().split(/\s+/).map (word)->
+            word[0].toUpperCase() + word[1..]
+        .join ' '
+
+    # remove duplicate items
+    Array::unique = ->
+        obj = {}
+        obj[@[key]] = @[key] for key in [0..@length]
+        value for key, value of obj
+
+    # revert a obj array to dict can be searched by some property
+    Array::toDict = (keyProperty) ->
+        @reduce (dict, obj)->
+            dict[obj[keyProperty]] = obj if obj[key]?
+            dict
+        , {}
+    Array::shuffle = ->
+        @sort -> 0.5 - Math.random()
 
     # Array-Like objects, such as arguments Object, HTMLCollection
     class ArrayLike
@@ -134,5 +159,16 @@
             curState & @flagMap[flag]
         checkOff: (curState, flag)->
             not @checkOn curState, flag
+
+    class Model
+        constructor: (@_attr)->
+        get: (key)->
+            @_attr[key]
+        set: (key, value)->
+            @_attr[key] = value
+            @
+        on: (e, handler)->
+
+
 
 
